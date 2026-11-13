@@ -99,6 +99,48 @@ td{padding:8px 4px;border-bottom:1px solid var(--line)}
 td:last-child{text-align:right}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
   background:var(--paper);color:var(--ink);padding:10px 18px;border-radius:16px;text-align:center;width:max-content;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.35);max-width:90vw}
+
+/* ---------- overlays, logo and bottle animations ---------- */
+.overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;
+  background:rgba(22,6,13,.86);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.overlay.splash{background:radial-gradient(90% 60% at 50% 40%, #5a2036 0%, var(--velvet-deep) 70%)}
+.stage{text-align:center;max-width:360px}
+.stage svg{display:block;margin:0 auto}
+.stage .big{font-family:var(--display);font-size:2rem;line-height:1.1;margin:14px 0 4px}
+.stage .voice{font-size:.9rem;color:var(--gold)}
+.stage .hint{font-size:.85rem;color:#c7aeb0;margin-top:18px}
+.logo-title{font-family:var(--display);font-size:clamp(2.4rem,12vw,3.4rem);line-height:.95;margin:18px 0 6px}
+.logo-title span{display:inline-block}
+.logo-title .word{white-space:nowrap;opacity:1;transform:none;animation:none}
+.logo-sub{color:var(--gold);letter-spacing:.04em}
+.mini-logo{display:block;margin-bottom:6px}
+.bottles{display:flex;justify-content:center;gap:8px}
+
+.cork,.drop,.bottle-body,.wine{transform-box:fill-box;transform-origin:center}
+.ask{background:var(--paper);color:var(--ink);border-radius:14px;padding:22px 20px 18px;max-width:340px;width:100%;
+  box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.ask p{font-size:1.05rem;white-space:pre-line}
+.ask .row{justify-content:flex-end;margin-top:8px}
+.ask .ghost{color:var(--ink);border-color:var(--paper-edge)}
+
+@media (prefers-reduced-motion:no-preference){
+  .shake .bottle-body{animation:shake .45s ease-in-out}
+  .pop .cork{animation:pop 1s cubic-bezier(.2,.9,.3,1) .4s forwards}
+  .pop .drop{opacity:0;animation:spray .9s ease-out .45s forwards}
+  .fall .cork{animation:fall .9s ease-in .9s forwards}
+  .rise .wine{transform:scaleY(0);transform-origin:bottom;animation:rise .7s ease-out .7s forwards}
+  .fade-in{opacity:0;animation:fadein .4s ease-out forwards}
+  .logo-title span{opacity:0;transform:translateY(14px);animation:letter .5s cubic-bezier(.2,1.4,.4,1) forwards}
+  .splash .bottle-body{animation:glow 2.4s ease-in-out infinite}
+  @keyframes shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-6deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(3deg)}}
+  @keyframes pop{0%{transform:none}15%{transform:translateY(-8px)}70%{transform:translate(18px,-150px) rotate(260deg)}100%{transform:translate(26px,-120px) rotate(380deg);opacity:0}}
+  @keyframes fall{to{transform:translate(-30px,240px) rotate(-200deg);opacity:0}}
+  @keyframes spray{0%{opacity:1;transform:none}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+  @keyframes rise{to{transform:scaleY(1)}}
+  @keyframes fadein{to{opacity:1}}
+  @keyframes letter{to{opacity:1;transform:none}}
+  @keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(201,160,80,0))}50%{filter:drop-shadow(0 0 14px rgba(201,160,80,.55))}}
+}
 </style>
 </head>
 <body>
@@ -146,10 +188,119 @@ async function call(url, body) {
   return data;
 }
 
+// ---------- bottles, logo, overlays ----------
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const NS = "http://www.w3.org/2000/svg";
+
+function svg(markup, w, h) {
+  const t = document.createElement("template");
+  t.innerHTML = `<svg xmlns="${NS}" viewBox="0 0 120 300" width="${w}" height="${h}" aria-hidden="true">${markup}</svg>`;
+  return t.content.firstChild;
+}
+
+// original logo: a wine bottle with a keyhole on its label
+function bottleMarkup({ drops = false, wine = false } = {}) {
+  const sprays = drops
+    ? Array.from({ length: 9 }, (_, i) => {
+        const a = (-150 + i * 15) * Math.PI / 180, d = 50 + (i % 3) * 22;
+        return `<circle class="drop" cx="60" cy="38" r="${3 + (i % 2)}" fill="${i % 3 ? "#9e2a3a" : "#c9a050"}"
+          style="--dx:${Math.round(Math.cos(a) * d)}px;--dy:${Math.round(Math.sin(a) * d)}px"/>`;
+      }).join("")
+    : "";
+  return `
+    <g class="bottle-body">
+      <path d="M48 40h24v40c0 20 28 30 28 60v140a12 12 0 0 1-12 12H32a12 12 0 0 1-12-12V140c0-30 28-40 28-60z"
+        fill="#2a0c18" stroke="#c9a050" stroke-width="2.5"/>
+      ${wine ? `<path class="wine" d="M23 205h74v75a9 9 0 0 1-9 9H32a9 9 0 0 1-9-9z" fill="#7a1d33" opacity=".9"/>` : ""}
+      <rect x="46" y="40" width="28" height="30" rx="2" fill="#9e2a3a"/>
+      <rect x="30" y="165" width="60" height="78" rx="5" fill="#f4e7d7"/>
+      <circle cx="60" cy="192" r="8.5" fill="#2b1520"/>
+      <path d="M55.5 197h9l3.5 26h-16z" fill="#2b1520"/>
+      <path d="M38 233h44" stroke="#c9a050" stroke-width="2"/>
+    </g>
+    ${sprays}
+    <rect class="cork" x="50" y="6" width="20" height="36" rx="4" fill="#c99868" stroke="#8a6440" stroke-width="1.5"/>
+    <path class="cork" d="M53 14h14M53 24h14M53 34h14" stroke="#8a6440" stroke-width="1" opacity=".6"/>`;
+}
+
+function overlay(cls, ...kids) {
+  const o = el("div", { class: "overlay " + cls, role: "dialog", "aria-modal": "true" }, ...kids);
+  document.body.append(o);
+  return o;
+}
+
+// in-page confirm (Safari can block native dialogs)
+function ask(message, okLabel = "Confirmer") {
+  return new Promise((resolve) => {
+    const done = (v) => { o.remove(); resolve(v); };
+    const ok = el("button", { onclick: () => done(true) }, okLabel);
+    const o = overlay("", el("div", { class: "ask" }, el("p", {}, message),
+      el("div", { class: "row" }, el("button", { class: "ghost", onclick: () => done(false) }, "Annuler"), ok)));
+    o.addEventListener("click", (e) => e.target === o && done(false));
+    ok.focus();
+  });
+}
+
+// uncork animation after a guess, with the verdict
+function uncork(result) {
+  return new Promise((resolve) => {
+    const good = result === true, bad = result === false;
+    const bottle = svg(bottleMarkup({ drops: !bad, wine: good }), 110, 250);
+    bottle.classList.add("shake", bad ? "fall" : "pop");
+    if (good) bottle.classList.add("rise");
+    const title = good ? "Bien vu !" : bad ? "Raté…" : "Mis en cave";
+    const line = good ? "Belle dégustation. +1" : bad ? "Ce n'était pas ce cépage. −1" : "Verdict au grand débouchage.";
+    const delay = reduceMotion ? 0 : 0.9;
+    const text = el("div", { class: "fade-in", style: `animation-delay:${delay}s` },
+      el("p", { class: "big" }, title), el("p", {}, line), el("p", { class: "voice" }, "La Voix du Sommelier"));
+    const o = overlay("", el("div", { class: "stage" }, bottle, text));
+    let closed = false;
+    const close = () => { if (closed) return; closed = true; o.remove(); resolve(); };
+    o.addEventListener("click", close);
+    setTimeout(close, reduceMotion ? 1400 : 2600);
+  });
+}
+
+// intro splash, once per visit
+function splash() {
+  if (sessionStorage.getItem("qcq-splash")) return;
+  sessionStorage.setItem("qcq-splash", "1");
+  const word = "Secret StoRiesling";
+  // one block per word so the title never breaks inside a word
+  let k = 0;
+  const title = el("h1", { class: "logo-title" },
+    word.split(" ").flatMap((w, wi) => [wi ? " " : "", el("span", { class: "word" },
+      [...w].map((c) => el("span", { style: `animation-delay:${0.5 + k++ * 0.05}s` }, c)))]));
+  const o = overlay("splash", el("div", { class: "stage" },
+    svg(bottleMarkup(), 90, 220), title,
+    el("p", { class: "logo-sub fade-in", style: "animation-delay:1.6s" }, "La cave des secrets"),
+    el("p", { class: "hint fade-in", style: "animation-delay:2.2s" }, "Touche pour entrer")));
+  const close = () => o.remove();
+  o.addEventListener("click", close);
+  setTimeout(close, reduceMotion ? 1500 : 4200);
+}
+
+// big reveal: three bottles pop one after another
+function grandDebouchage() {
+  const bottles = el("div", { class: "bottles" }, [0, 1, 2].map((i) => {
+    const b = svg(bottleMarkup({ drops: true }), 70, 175);
+    b.classList.add("shake", "pop");
+    b.style.setProperty("--i", i);
+    b.querySelectorAll(".cork,.drop,.bottle-body").forEach((n) => (n.style.animationDelay = `${0.2 + i * 0.45}s`));
+    return b;
+  }));
+  const o = overlay("splash", el("div", { class: "stage" }, bottles,
+    el("p", { class: "logo-title fade-in", style: "animation-delay:1.4s" }, "Le grand débouchage"),
+    el("p", { class: "logo-sub fade-in", style: "animation-delay:1.9s" }, "Découvre qui cachait quoi"),
+    el("p", { class: "hint fade-in", style: "animation-delay:2.4s" }, "Touche pour voir les réponses")));
+  o.addEventListener("click", () => o.remove());
+}
+
 // ---------- player screens ----------
 
 function header(sub) {
-  return [el("h1", {}, "Secret StoRiesling"), sub ? el("p", { class: "lede" }, sub) : null];
+  const logo = svg(bottleMarkup(), 22, 55); logo.classList.add("mini-logo");
+  return [logo, el("h1", {}, "Secret StoRiesling"), sub ? el("p", { class: "lede" }, sub) : null];
 }
 
 function joinScreen() {
@@ -292,14 +443,14 @@ function noteFor(sec) {
 async function guess(sec, name) {
   if (!name) return toast("Choisis un prénom");
   const blind = S.settings.mode === "aveugle";
-  if (!confirm(`Secret n°${sec.n} : tu réponds ${name} ?` + (blind ? "" : "\nSi c'est faux : −1 point."))) return;
+  if (!(await ask(`Secret n°${sec.n} : tu réponds ${name} ?` + (blind ? "" : "\nSi c'est faux : −1 point."), "Faire sauter le bouchon"))) return;
   try {
     S = await call("/api/guess", { secretId: sec.id, name });
-    delete drafts[sec.id]; justGuessed = sec.id; render();
+    delete drafts[sec.id];
     const g = S.me.guesses[sec.id];
-    toast(g.lastCorrect === true ? "Bien vu, belle dégustation ! +1"
-      : g.lastCorrect === false ? `Raté, ce n'était pas ce cépage… −1. Nouvel essai dans ${fmtWait(g.retryMs)}.`
-      : "Réponse mise en cave. Verdict au grand débouchage.", true);
+    await uncork(g.lastCorrect);
+    justGuessed = sec.id; render();
+    if (g.lastCorrect === false) toast(`Nouvel essai sur ce secret dans ${fmtWait(g.retryMs)}.`, true);
   } catch (e) { toast(e.message); refresh(); }
 }
 
@@ -357,18 +508,18 @@ function adminScreen() {
       el("label", { for: "md" }, "Résultats"), mode,
       el("label", { for: "rt" }, "Minutes avant de retenter un secret raté"), rt,
       el("label", { for: "cd2" }, "Secondes entre deux réponses"), cd,
-      el("div", { class: "row" }, el("button", { onclick: () => confirm("Lancer la partie ? Les inscriptions seront fermées.") && admin("start", { mode: mode.value, retryMin: rt.value, cooldownSec: cd.value }) }, "Lancer la partie"))));
+      el("div", { class: "row" }, el("button", { onclick: async () => (await ask("Lancer la partie ? Les inscriptions seront fermées.", "Lancer")) && admin("start", { mode: mode.value, retryMin: rt.value, cooldownSec: cd.value }) }, "Lancer la partie"))));
   }
-  if (A.phase === "jeu") out.push(el("div", { class: "row" }, el("button", { onclick: () => confirm("Lancer le grand débouchage ? Tous les secrets seront révélés.") && admin("reveal") }, "Lancer le grand débouchage")));
+  if (A.phase === "jeu") out.push(el("div", { class: "row" }, el("button", { onclick: async () => (await ask("Lancer le grand débouchage ? Tous les secrets seront révélés.", "Déboucher")) && (await admin("reveal"), grandDebouchage()) }, "Lancer le grand débouchage")));
   out.push(el("div", { class: "card" }, el("h2", {}, "Joueurs"),
     el("table", {}, A.players.map((p) => el("tr", {},
       el("td", {}, p.name),
       el("td", {}, A.phase === "inscription"
-        ? el("button", { class: "ghost", onclick: () => confirm(`Retirer ${p.name} ?`) && admin("kick", { id: p.id }) }, "Retirer")
+        ? el("button", { class: "ghost", onclick: async () => (await ask(`Retirer ${p.name} ?`, "Retirer")) && admin("kick", { id: p.id }) }, "Retirer")
         : `${p.answered} rép.`))))));
   out.push(el("div", { class: "row" },
     el("button", { class: "ghost", onclick: () => admin("state") }, "Actualiser"),
-    el("button", { class: "danger", onclick: () => confirm("Tout effacer et recommencer ?") && admin("reset") }, "Tout effacer")));
+    el("button", { class: "danger", onclick: async () => (await ask("Tout effacer et recommencer ?", "Tout effacer")) && admin("reset") }, "Tout effacer")));
   return out;
 }
 
@@ -394,6 +545,11 @@ async function refresh() {
     const changed = JSON.stringify({ ...next, me: next.me && { ...next.me, cooldownMs: 0 } }) !==
                     JSON.stringify(S && { ...S, me: S.me && { ...S.me, cooldownMs: 0 } });
     S = next;
+    // play the big reveal once per player
+    if (next.me && next.phase === "revelation" && !localStorage.getItem("qcq-reveal")) {
+      localStorage.setItem("qcq-reveal", "1");
+      tab = "secrets"; render(); grandDebouchage();
+    } else if (next.phase !== "revelation") localStorage.removeItem("qcq-reveal");
     if (!busy && changed) render();
     else tickCooldown();
   } catch { if (!S) $app.replaceChildren(...header("Serveur injoignable. Réessai dans quelques secondes.")); }
@@ -408,6 +564,7 @@ function tickCooldown() {
 setInterval(() => { if (S?.me?.cooldownMs > 0) { S.me.cooldownMs = Math.max(0, S.me.cooldownMs - 1000); tickCooldown(); } }, 1000);
 
 window.addEventListener("hashchange", () => { if (isAdmin() && adminPw && !A) admin("state"); else render(); });
+splash();
 if (isAdmin() && adminPw) admin("state");
 refresh();
 setInterval(() => { if (!isAdmin()) refresh(); }, 4000);

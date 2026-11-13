@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Secret StoRiesling</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍷</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --velvet:#3b1626; --velvet-deep:#260d18; --paper:#f4e7d7; --paper-edge:#e3d0ba;
+  --ink:#2b1520; --muted:#8a6f78; --wax:#9e2a3a; --gold:#c9a050;
+  --ok:#5f9468; --ko:#c9503f; --line:rgba(244,231,215,.16);
+  --display:"Gloock", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{background:var(--velvet-deep)}
+body{margin:0;min-height:100vh;font-family:var(--body);color:var(--paper);
+  background:radial-gradient(120% 70% at 50% 0%, var(--velvet) 0%, var(--velvet-deep) 75%);
+  line-height:1.5;-webkit-font-smoothing:antialiased}
+main{max-width:620px;margin:0 auto;padding:28px 18px 80px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,11vw,3.6rem);line-height:.95;margin:6px 0 10px;letter-spacing:-.01em}
+h2{font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0 0 6px}
+p{margin:0 0 12px}
+.lede{color:#d9c3b4;max-width:46ch}
+.small{font-size:.88rem;color:#c7aeb0}
+
+/* forms */
+label{display:block;font-weight:500;margin:16px 0 6px}
+input,textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--paper);
+  border:2px solid transparent;border-radius:10px;padding:12px 14px}
+textarea{min-height:110px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
+button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:999px;padding:12px 22px;
+  background:var(--gold);color:var(--ink)}
+button:hover{filter:brightness(1.06)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--paper);outline-offset:3px}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--paper);border:1.5px solid var(--line)}
+button.danger{background:var(--ko);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.error{background:rgba(201,80,63,.18);border-left:3px solid var(--ko);padding:10px 12px;border-radius:6px;margin-top:14px}
+.hidden{display:none!important}
+
+/* status strip */
+.strip{display:flex;gap:18px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:18px 0}
+.strip b{font-family:var(--display);font-weight:400;font-size:1.7rem;display:block;line-height:1}
+.strip span{font-size:.85rem;color:#c7aeb0}
+
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tabs button{background:transparent;color:var(--paper);border:1.5px solid var(--line);padding:8px 16px;font-weight:500}
+.tabs button[aria-selected="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+
+/* secret notes: the memorable bit */
+.notes{display:grid;gap:18px}
+.note{position:relative;background:var(--paper);color:var(--ink);border-radius:4px;
+  padding:22px 18px 16px 62px;box-shadow:0 1px 0 var(--paper-edge),0 10px 24px rgba(0,0,0,.28)}
+.note:nth-child(odd){transform:rotate(-.35deg)}
+.note:nth-child(even){transform:rotate(.3deg)}
+.seal{position:absolute;left:12px;top:16px;width:38px;height:38px;border-radius:50%;
+  background:var(--wax);color:var(--paper);display:grid;place-items:center;
+  font-family:var(--display);font-size:1.05rem;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.22),0 2px 4px rgba(0,0,0,.25)}
+.note.ok .seal{background:var(--ok)}
+.note.ko .seal{background:#8a7a7e}
+.note.mine .seal{background:var(--gold);color:var(--ink)}
+.note blockquote{margin:0 0 12px;font-family:var(--display);font-size:1.18rem;line-height:1.35;overflow-wrap:anywhere}
+.note .pick{display:flex;gap:8px;flex-wrap:wrap}
+.note .pick select{flex:1 1 170px;width:auto}
+.note .pick select{border-color:var(--paper-edge);background:#fff}
+.note .pick button{padding:10px 16px;background:var(--ink);color:var(--paper);flex:1 1 auto}
+.verdict{font-size:.95rem;color:var(--muted)}
+.verdict strong{color:var(--ink)}
+.note.ok .verdict strong{color:var(--ok)}
+.note.ko .verdict s{color:var(--ko)}
+@media (prefers-reduced-motion:no-preference){
+  .note.just .seal{animation:stamp .5s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes stamp{from{transform:scale(1.8) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+}
+
+/* leaderboard */
+ol.board{list-style:none;margin:0;padding:0}
+ol.board li{display:grid;grid-template-columns:2.2rem 1fr auto;gap:10px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line)}
+ol.board .rk{font-family:var(--display);font-size:1.3rem;color:var(--gold)}
+ol.board .me{color:var(--gold);font-weight:700}
+ol.board .sc{font-variant-numeric:tabular-nums;text-align:right}
+ol.board .sc small{color:#c7aeb0;margin-left:6px}
+
+.code{font-family:var(--display);font-size:2rem;letter-spacing:.12em;color:var(--gold)}
+.card{background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:18px}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+td{padding:8px 4px;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  background:var(--paper);color:var(--ink);padding:10px 18px;border-radius:16px;text-align:center;width:max-content;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.35);max-width:90vw}
+</style>
+</head>
+<body>
+<main id="app"><h1>Secret StoRiesling</h1><p class="lede">Chargement…</p></main>
+<div class="toast hidden" id="toast" role="status"></div>
+
+<script>
+// Front end. Pure DOM, polling every 4 s. All text goes through textContent.
+const $app = document.getElementById("app");
+const LS = "qcq-token";
+let token = localStorage.getItem(LS) || "";
+let S = null;            // last state from server
+let tab = "secrets";
+let drafts = {};         // secretId -> chosen name, kept across refreshes
+let justGuessed = null;
+let adminPw = sessionStorage.getItem("qcq-admin") || "";
+
+const isAdmin = () => location.hash === "#admin";
+
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) n.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) n.append(k.nodeType ? k : String(k));
+  return n;
+}
+
+function toast(msg, voice) {
+  const t = document.getElementById("toast");
+  t.textContent = voice ? "La Voix du Sommelier : " + msg : msg; t.classList.remove("hidden");
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add("hidden"), 3200);
+}
+
+async function call(url, body) {
+  const r = await fetch(url, {
+    method: body ? "POST" : "GET",
+    headers: { "content-type": "application/json", "x-token": token },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => ({ error: "Réponse illisible du serveur." }));
+  if (!r.ok) throw new Error(data.error || "Erreur");
+  return data;
+}
+
+// ---------- player screens ----------
+
+function header(sub) {
+  return [el("h1", {}, "Secret StoRiesling"), sub ? el("p", { class: "lede" }, sub) : null];
+}
+
+function joinScreen() {
+  const err = el("div", { class: "error hidden", role: "alert" });
+  const name = el("input", { id: "name", maxlength: 30, autocomplete: "given-name", placeholder: "Léa" });
+  const secret = el("textarea", { id: "secret", maxlength: 280, placeholder: "J'ai déjà…" });
+  const loginBox = el("div", { class: "card hidden" },
+    el("h2", {}, "Déjà inscrit ?"),
+    el("p", { class: "small" }, "Sur un autre téléphone, entre ton prénom et ton code à 6 chiffres."),
+    el("label", { for: "ln" }, "Prénom"), el("input", { id: "ln", maxlength: 30 }),
+    el("label", { for: "lc" }, "Code"), el("input", { id: "lc", inputmode: "numeric", maxlength: 6 }),
+    el("div", { class: "row" }, el("button", { onclick: async () => {
+      try {
+        const r = await call("/api/login", { name: ln.value, code: lc.value });
+        token = r.token; localStorage.setItem(LS, token); refresh();
+      } catch (e) { toast(e.message); }
+    } }, "Me reconnecter")));
+  const open = S.phase === "inscription";
+  return [
+    ...header(open
+      ? "Dépose un secret sous ton prénom. Personne ne saura qu'il est à toi, et toi tu devras deviner à qui sont les autres."
+      : "La partie a commencé, les inscriptions sont fermées."),
+    open ? el("div", {},
+      el("label", { for: "name" }, "Ton prénom"), name,
+      el("label", { for: "secret" }, "Ton secret"), secret,
+      el("p", { class: "small" }, "280 caractères maximum. Évite les détails qui te trahissent trop vite."),
+      err,
+      el("div", { class: "row" },
+        el("button", { onclick: async (e) => {
+          e.target.disabled = true;
+          try {
+            const r = await call("/api/join", { name: name.value, secret: secret.value });
+            token = r.token; localStorage.setItem(LS, token); refresh();
+          } catch (x) { err.textContent = x.message; err.classList.remove("hidden"); e.target.disabled = false; }
+        } }, "Déposer mon secret"),
+        el("button", { class: "ghost", onclick: () => loginBox.classList.toggle("hidden") }, "Déjà inscrit"))
+    ) : el("div", { class: "row" }, el("button", { class: "ghost", onclick: () => loginBox.classList.toggle("hidden") }, "Déjà inscrit")),
+    loginBox,
+  ];
+}
+
+function waitingScreen() {
+  const me = S.me;
+  const ta = el("textarea", { maxlength: 280 }, me.secret);
+  return [
+    ...header(`C'est noté, ${me.name}. On attend que tout le monde ait déposé son secret.`),
+    el("div", { class: "strip" }, el("div", {}, el("b", {}, S.count), el("span", {}, "secrets déposés"))),
+    el("div", { class: "card" },
+      el("h2", {}, "Ton code de secours"),
+      el("p", { class: "code" }, me.code),
+      el("p", { class: "small" }, "Note le. Il te permet de revenir dans la partie depuis un autre téléphone.")),
+    el("div", { class: "card" },
+      el("h2", {}, "Ton secret"),
+      el("p", { class: "small" }, "Modifiable jusqu'au lancement de la partie."),
+      ta,
+      el("div", { class: "row" }, el("button", { onclick: async () => {
+        try { S = await call("/api/secret", { secret: ta.value }); toast("Secret modifié", true); } catch (e) { toast(e.message); }
+      } }, "Modifier mon secret"))),
+  ];
+}
+
+const fmtWait = (ms) => {
+  const m = Math.ceil(ms / 60000);
+  return m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? String(m % 60).padStart(2, "0") : ""}` : `${m} min`;
+};
+const signed = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0");
+
+function rulesLine() {
+  const st = S.settings;
+  const parts = st.mode === "aveugle"
+    ? ["Bonne réponse : +1, mauvaise : −1, comptées au grand débouchage.", "Tu peux changer d'avis jusque-là."]
+    : ["Bonne réponse : +1, mauvaise : −1.", `Après une erreur, tu peux retenter ce secret ${fmtWait(st.retryMin * 60000)} plus tard.`];
+  if (st.cooldownSec > 0) parts.push(`${st.cooldownSec} s entre deux réponses.`);
+  return parts.join(" ");
+}
+
+function strip() {
+  const me = S.me, blind = S.settings.mode === "aveugle" && S.phase === "jeu";
+  const total = S.secrets.length - 1;
+  const items = blind
+    ? [[`${me.answered}/${total}`, "réponses données"]]
+    : [[signed(me.points), "points"], [me.found, "trouvés"], [me.errors, "erreurs"]];
+  return el("div", { class: "strip" }, items.map(([b, s]) => el("div", {}, el("b", {}, b), el("span", {}, s))),
+    el("div", { id: "cd", class: me.cooldownMs > 0 && S.phase === "jeu" ? "" : "hidden" },
+      el("b", {}, Math.ceil(me.cooldownMs / 1000) + " s"), el("span", {}, "avant la prochaine")));
+}
+
+// can the player answer this secret right now?
+function open_(sec) {
+  const g = S.me.guesses[sec.id];
+  if (sec.id === S.me.secretId) return false;
+  if (S.settings.mode === "aveugle") return true;
+  return !g || (!g.solved && !(g.retryMs > 0));
+}
+
+function picker(sec, exclude, current, label) {
+  const sel = el("select", { "aria-label": `Prénom pour le secret ${sec.n}`, onchange: (e) => (drafts[sec.id] = e.target.value) },
+    el("option", { value: "" }, "Qui a écrit ça ?"),
+    S.names.filter((n) => n !== S.me.name && !exclude.includes(n))
+      .map((n) => el("option", { value: n, selected: (drafts[sec.id] ?? current) === n }, n)));
+  return el("div", { class: "pick" }, sel, el("button", { onclick: () => guess(sec, sel.value) }, label));
+}
+
+function noteFor(sec) {
+  const me = S.me, mine = sec.id === me.secretId, g = me.guesses[sec.id];
+  const reveal = S.phase === "revelation", blind = S.settings.mode === "aveugle";
+  const wrong = g?.wrong || [];
+  let cls = "note", bottom;
+  const struck = () => wrong.flatMap((n, i) => [i ? ", " : "", el("s", {}, n)]);
+
+  if (mine) {
+    cls += " mine";
+    bottom = el("p", { class: "verdict" }, el("strong", {}, "Ton secret."),
+      reveal ? ` Trouvé par ${sec.foundBy} personne${sec.foundBy > 1 ? "s" : ""}.` : " Fais comme si de rien n'était.");
+  } else if (reveal) {
+    cls += g?.solved ? " ok" : g ? " ko" : "";
+    bottom = g?.solved
+      ? el("p", { class: "verdict" }, "Bien vu : ", el("strong", {}, sec.owner))
+      : el("p", { class: "verdict" }, wrong.length ? ["Tu as dit ", ...struck(), ". "] : "", "C'était ", el("strong", {}, sec.owner));
+  } else if (blind) {
+    bottom = el("div", {},
+      g ? el("p", { class: "verdict" }, "Ta réponse : ", el("strong", {}, g.last)) : null,
+      picker(sec, [], g?.last, g ? "Changer d'avis" : "Faire sauter le bouchon"));
+  } else if (g?.solved) {
+    cls += " ok";
+    bottom = el("p", { class: "verdict" }, "Bien vu : ", el("strong", {}, g.last));
+  } else if (g?.retryMs > 0) {
+    cls += " ko";
+    bottom = el("p", { class: "verdict" }, "Raté : ", ...struck(), `. Nouvel essai dans ${fmtWait(g.retryMs)}.`);
+  } else {
+    bottom = el("div", {},
+      wrong.length ? el("p", { class: "verdict" }, "Déjà essayé : ", ...struck()) : null,
+      picker(sec, wrong, null, "Faire sauter le bouchon"));
+  }
+  if (justGuessed === sec.id) cls += " just";
+  return el("article", { class: cls }, el("div", { class: "seal", "aria-hidden": "true" }, sec.n),
+    el("blockquote", {}, sec.text), bottom);
+}
+
+async function guess(sec, name) {
+  if (!name) return toast("Choisis un prénom");
+  const blind = S.settings.mode === "aveugle";
+  if (!confirm(`Secret n°${sec.n} : tu réponds ${name} ?` + (blind ? "" : "\nSi c'est faux : −1 point."))) return;
+  try {
+    S = await call("/api/guess", { secretId: sec.id, name });
+    delete drafts[sec.id]; justGuessed = sec.id; render();
+    const g = S.me.guesses[sec.id];
+    toast(g.lastCorrect === true ? "Bien vu, belle dégustation ! +1"
+      : g.lastCorrect === false ? `Raté, ce n'était pas ce cépage… −1. Nouvel essai dans ${fmtWait(g.retryMs)}.`
+      : "Réponse mise en cave. Verdict au grand débouchage.", true);
+  } catch (e) { toast(e.message); refresh(); }
+}
+
+function boardView() {
+  const full = S.board.length && "points" in S.board[0];
+  if (!S.board.length) return el("p", {}, "Personne n'a encore joué.");
+  return el("div", {},
+    full ? null : el("p", { class: "small" }, "Mode à l'aveugle : le classement s'affiche au grand débouchage. En attendant, voici qui a répondu le plus."),
+    el("ol", { class: "board" }, S.board.map((r, i) => el("li", {},
+      el("span", { class: "rk" }, i + 1),
+      el("span", { class: r.name === S.me?.name ? "me" : "" }, r.name),
+      el("span", { class: "sc" }, full ? [signed(r.points) + " pts", el("small", {}, `${r.found} ✓ ${r.errors} ✗`)] : [r.answered, el("small", {}, "rép.")])))));
+}
+
+function gameScreen() {
+  const reveal = S.phase === "revelation";
+  const sorted = [...S.secrets].sort((a, b) => {
+    // answerable first, own secret last
+    const w = (s) => (s.id === S.me.secretId ? 2 : open_(s) && !(S.settings.mode === "aveugle" && S.me.guesses[s.id]) ? 0 : 1);
+    return reveal ? a.n - b.n : w(a) - w(b) || a.n - b.n;
+  });
+  return [
+    ...header(reveal ? "Le grand débouchage ! Voici qui cachait quoi." : rulesLine()),
+    strip(),
+    el("div", { class: "tabs", role: "tablist" },
+      ["secrets", "classement"].map((t) => el("button", { role: "tab", "aria-selected": String(tab === t), onclick: () => { tab = t; render(); } },
+        t === "secrets" ? "Secrets" : "Classement"))),
+    tab === "secrets" ? el("div", { class: "notes" }, sorted.map(noteFor)) : boardView(),
+  ];
+}
+
+// ---------- admin ----------
+
+let A = null;
+async function admin(action, extra = {}) {
+  try {
+    A = await call("/api/admin/" + action, { password: adminPw, ...extra });
+    sessionStorage.setItem("qcq-admin", adminPw);
+  } catch (e) { toast(e.message); if (/Mot de passe/.test(e.message)) { adminPw = ""; A = null; } }
+  render();
+}
+
+function adminScreen() {
+  if (!A) {
+    const pw = el("input", { type: "password", id: "pw", autocomplete: "current-password" });
+    return [...header("Espace organisatrice."), el("label", { for: "pw" }, "Mot de passe"), pw,
+      el("div", { class: "row" }, el("button", { onclick: () => { adminPw = pw.value; admin("state"); } }, "Entrer"))];
+  }
+  const out = [...header(`Phase : ${({ inscription: "inscriptions", jeu: "partie en cours", revelation: "grand débouchage" })[A.phase]}. ${A.players.length} joueurs.`)];
+  if (A.phase === "inscription") {
+    const mode = el("select", { id: "md" }, el("option", { value: "direct" }, "En direct : on sait tout de suite"), el("option", { value: "aveugle" }, "À l'aveugle : tout au grand débouchage"));
+    const rt = el("input", { id: "rt", type: "number", min: 0, max: 1440, value: 60 });
+    const cd = el("input", { id: "cd2", type: "number", min: 0, max: 600, value: 15 });
+    out.push(el("div", { class: "card" }, el("h2", {}, "Réglages anti triche"),
+      el("label", { for: "md" }, "Résultats"), mode,
+      el("label", { for: "rt" }, "Minutes avant de retenter un secret raté"), rt,
+      el("label", { for: "cd2" }, "Secondes entre deux réponses"), cd,
+      el("div", { class: "row" }, el("button", { onclick: () => confirm("Lancer la partie ? Les inscriptions seront fermées.") && admin("start", { mode: mode.value, retryMin: rt.value, cooldownSec: cd.value }) }, "Lancer la partie"))));
+  }
+  if (A.phase === "jeu") out.push(el("div", { class: "row" }, el("button", { onclick: () => confirm("Lancer le grand débouchage ? Tous les secrets seront révélés.") && admin("reveal") }, "Lancer le grand débouchage")));
+  out.push(el("div", { class: "card" }, el("h2", {}, "Joueurs"),
+    el("table", {}, A.players.map((p) => el("tr", {},
+      el("td", {}, p.name),
+      el("td", {}, A.phase === "inscription"
+        ? el("button", { class: "ghost", onclick: () => confirm(`Retirer ${p.name} ?`) && admin("kick", { id: p.id }) }, "Retirer")
+        : `${p.answered} rép.`))))));
+  out.push(el("div", { class: "row" },
+    el("button", { class: "ghost", onclick: () => admin("state") }, "Actualiser"),
+    el("button", { class: "danger", onclick: () => confirm("Tout effacer et recommencer ?") && admin("reset") }, "Tout effacer")));
+  return out;
+}
+
+// ---------- render loop ----------
+
+function render() {
+  let view;
+  if (isAdmin()) view = adminScreen();
+  else if (!S) view = header("Connexion au serveur…");
+  else if (!S.me) view = joinScreen();
+  else if (S.phase === "inscription") view = waitingScreen();
+  else view = gameScreen();
+  $app.replaceChildren(...view.filter(Boolean));
+  justGuessed = null;
+}
+
+async function refresh() {
+  try {
+    const next = await call("/api/state");
+    if (token && !next.me) { token = ""; localStorage.removeItem(LS); }
+    // don't redraw while someone is typing or picking a name
+    const busy = document.activeElement && /SELECT|TEXTAREA|INPUT/.test(document.activeElement.tagName);
+    const changed = JSON.stringify({ ...next, me: next.me && { ...next.me, cooldownMs: 0 } }) !==
+                    JSON.stringify(S && { ...S, me: S.me && { ...S.me, cooldownMs: 0 } });
+    S = next;
+    if (!busy && changed) render();
+    else tickCooldown();
+  } catch { if (!S) $app.replaceChildren(...header("Serveur injoignable. Réessai dans quelques secondes.")); }
+}
+
+function tickCooldown() {
+  const c = document.getElementById("cd");
+  if (!c || !S?.me) return;
+  c.classList.toggle("hidden", !(S.me.cooldownMs > 0 && S.phase === "jeu"));
+  c.querySelector("b").textContent = Math.ceil(S.me.cooldownMs / 1000) + " s";
+}
+setInterval(() => { if (S?.me?.cooldownMs > 0) { S.me.cooldownMs = Math.max(0, S.me.cooldownMs - 1000); tickCooldown(); } }, 1000);
+
+window.addEventListener("hashchange", () => { if (isAdmin() && adminPw && !A) admin("state"); else render(); });
+if (isAdmin() && adminPw) admin("state");
+refresh();
+setInterval(() => { if (!isAdmin()) refresh(); }, 4000);
+</script>
+</body>
+</html>

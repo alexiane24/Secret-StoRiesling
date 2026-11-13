@@ -1,0 +1,8 @@
+{
+  "name": "secret-storiesling",
+  "version": "1.0.0",
+  "description": "Party game: guess who wrote each secret",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}

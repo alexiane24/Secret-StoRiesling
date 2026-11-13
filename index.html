@@ -141,6 +141,81 @@ td:last-child{text-align:right}
   @keyframes letter{to{opacity:1;transform:none}}
   @keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(201,160,80,0))}50%{filter:drop-shadow(0 0 14px rgba(201,160,80,.55))}}
 }
+
+/* ---------- wine pour, floods, header logo, T-Rex ---------- */
+.drop{opacity:0}
+.hdr{text-align:center}
+.hdr .lede{margin-left:auto;margin-right:auto}
+.mini-logo{margin:0 auto 4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pour-stage{position:fixed;inset:0;z-index:60;overflow:hidden;
+  background:radial-gradient(90% 60% at 50% 35%, #5a2036 0%, var(--velvet-deep) 70%)}
+.pour-bottle{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);z-index:2}
+.pour-text{position:absolute;left:0;right:0;top:calc(30% + 125px);text-align:center;padding:0 20px;z-index:2}
+.pour-text .row{justify-content:center}
+.stream{position:absolute;left:50%;width:12px;margin-left:-6px;top:calc(30% + 76px);bottom:0;
+  background:linear-gradient(90deg,#6e1630,#a8304a 50%,#6e1630);border-radius:6px;transform:scaleY(0);transform-origin:top;z-index:1}
+.flood{position:absolute;left:0;right:0;bottom:0;height:115%;transform:translateY(calc(100% + 30px));z-index:3;
+  background:linear-gradient(#8a2238 0%,#5e1428 60%,#3c0a19 100%)}
+.flood::before{content:"";position:absolute;left:0;right:0;top:-25px;height:26px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 26'%3E%3Cpath d='M0 14 Q30 0 60 14 T120 14 V26 H0Z' fill='%238a2238'/%3E%3C/svg%3E") repeat-x;
+  background-size:120px 26px}
+.flood i{position:absolute;bottom:10%;width:8px;height:8px;border-radius:50%;background:rgba(255,220,230,.35)}
+.wave-stage{position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden}
+.wave-text{position:absolute;inset:0;display:grid;place-items:center;z-index:4;margin:0;padding:24px;text-align:center;
+  font-family:var(--display);font-size:2.1rem;line-height:1.1;color:var(--paper);opacity:0}
+.dino-wrap{position:relative;margin:18px auto 6px;max-width:340px;text-align:center}
+.dino{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bubble{position:absolute;right:0;top:-8px;width:47%;background:var(--paper);color:var(--ink);
+  font-weight:700;font-size:.95rem;line-height:1.3;padding:10px 14px;border-radius:16px;text-align:left;
+  box-shadow:0 8px 20px rgba(0,0,0,.35);z-index:2;pointer-events:none}
+.bubble::after{content:"";position:absolute;left:-11px;top:38%;border:8px solid transparent;border-right:12px solid var(--paper);border-left:0}
+.dino{width:100%;height:auto;display:block}
+.dino-cap{font-size:.85rem;color:#c7aeb0;margin-top:2px}
+.dino .jaw,.dino .tail,.dino .head,.dino .glass,.dino .crumb{transform-box:view-box}
+
+@media (prefers-reduced-motion:no-preference){
+  .mini-logo{animation:sway 3.2s ease-in-out infinite;transform-origin:50% 100%}
+  .mini-logo.mini-pop .cork{animation:corkloop 1.3s cubic-bezier(.3,.8,.4,1)}
+  .mini-logo.mini-pop .drop{animation:spray .8s ease-out .1s}
+  .pouring .pour-text{animation:fadeout .3s forwards}
+  .pouring .bottle-body{animation:shake .45s ease-in-out .1s}
+  .pouring .cork{animation:pop .75s cubic-bezier(.2,.9,.3,1) .45s forwards}
+  .pouring .pour-bottle{animation:tip .55s cubic-bezier(.5,0,.4,1.3) .9s forwards}
+  .pouring .stream{animation:stream .25s linear 1.35s forwards}
+  .pouring .flood{animation:flood 1.05s cubic-bezier(.5,0,.3,1) 1.5s forwards}
+  .pouring{animation:fadeout .55s ease 2.65s forwards}
+  .flood::before{animation:waves .9s linear infinite}
+  .flood i{animation:bubble 1.6s ease-in infinite}
+  .wave-stage .flood{animation:flood .8s cubic-bezier(.5,0,.3,1) forwards}
+  .wave-stage .wave-text{animation:fadein .3s ease .6s forwards}
+  .wave-stage.out{animation:fadeout .55s ease forwards}
+  .drain .flood{animation:flood .8s cubic-bezier(.5,0,.3,1) forwards}
+  .drain{animation:fadeout .5s ease .95s forwards}
+  .dino .jaw{transform-origin:165px 80px;animation:chomp 1.7s ease-in-out infinite}
+  .dino .head{animation:bob 1.7s ease-in-out infinite}
+  .dino .tail{transform-origin:205px 145px;animation:wag 2.6s ease-in-out infinite}
+  .dino .glass{transform-origin:114px 150px;animation:swirl 2.2s ease-in-out infinite}
+  .dino .crumb{animation:crumb 1.7s ease-in infinite}
+  .dino .crumb.c2{animation-delay:.25s}
+  .bubble{animation:bubblein .35s cubic-bezier(.2,1.6,.4,1)}
+  .bubble.bye{animation:fadeout .3s forwards}
+  .dino.grumpy .head{animation:grumpy .5s ease-in-out}
+  @keyframes bubblein{from{transform:scale(.3) translateX(-30px);opacity:0}to{transform:none;opacity:1}}
+  @keyframes grumpy{0%,100%{transform:none}20%{transform:rotate(-5deg) translateY(-3px)}50%{transform:rotate(4deg)}75%{transform:rotate(-3deg)}}
+  @keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  @keyframes corkloop{0%{transform:none}40%{transform:translateY(-70px) rotate(360deg)}75%{transform:translateY(-4px) rotate(700deg)}100%{transform:rotate(720deg)}}
+  @keyframes fadeout{to{opacity:0}}
+  @keyframes tip{to{transform:translate(-50%,-50%) rotate(180deg)}}
+  @keyframes stream{to{transform:scaleY(1)}}
+  @keyframes flood{to{transform:translateY(0)}}
+  @keyframes waves{to{background-position:120px 0}}
+  @keyframes bubble{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-300px);opacity:0}}
+  @keyframes chomp{0%,45%,100%{transform:rotate(0)}10%,32%{transform:rotate(-17deg)}21%{transform:rotate(-3deg)}}
+  @keyframes bob{0%,45%,100%{transform:translateY(0)}20%{transform:translateY(2px)}}
+  @keyframes wag{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(5deg)}}
+  @keyframes swirl{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(7deg)}}
+  @keyframes crumb{0%,30%{transform:translateY(0);opacity:0}35%{opacity:1}100%{transform:translateY(62px);opacity:0}}
+}
 </style>
 </head>
 <body>
@@ -261,7 +336,24 @@ function uncork(result) {
   });
 }
 
-// intro splash, once per visit
+// wine flood layer with a moving wave and bubbles
+function floodEl() {
+  return el("div", { class: "flood" },
+    [12, 28, 47, 63, 79, 91].map((x, i) => el("i", { style: `left:${x}%;animation-delay:${i * 0.23}s` })));
+}
+
+// quick wine wave between two screens
+function wineWave(text, onCovered) {
+  if (reduceMotion) { onCovered?.(); return; }
+  const o = el("div", { class: "wave-stage", "aria-hidden": "true" }, floodEl(), el("p", { class: "wave-text" }, text));
+  document.body.append(o);
+  setTimeout(async () => {
+    try { await onCovered?.(); } catch {}
+    setTimeout(() => { o.classList.add("out"); setTimeout(() => o.remove(), 600); }, 450);
+  }, 850);
+}
+
+// intro: tap Enter, the cork pops, the bottle pours and wine fills the page
 function splash() {
   if (sessionStorage.getItem("qcq-splash")) return;
   sessionStorage.setItem("qcq-splash", "1");
@@ -271,21 +363,32 @@ function splash() {
   const title = el("h1", { class: "logo-title" },
     word.split(" ").flatMap((w, wi) => [wi ? " " : "", el("span", { class: "word" },
       [...w].map((c) => el("span", { style: `animation-delay:${0.5 + k++ * 0.05}s` }, c)))]));
-  const o = overlay("splash", el("div", { class: "stage" },
-    svg(bottleMarkup(), 90, 220), title,
-    el("p", { class: "logo-sub fade-in", style: "animation-delay:1.6s" }, "La cave des secrets"),
-    el("p", { class: "hint fade-in", style: "animation-delay:2.2s" }, "Touche pour entrer")));
-  const close = () => o.remove();
-  o.addEventListener("click", close);
-  setTimeout(close, reduceMotion ? 1500 : 4200);
+  const enter = el("button", {}, "Entrer dans la cave");
+  const o = el("div", { class: "pour-stage splash", role: "dialog", "aria-modal": "true", "aria-label": "Secret StoRiesling" },
+    el("div", { class: "pour-bottle" }, svg(bottleMarkup(), 90, 220)),
+    el("div", { class: "stream" }),
+    floodEl(),
+    el("div", { class: "pour-text" }, title,
+      el("p", { class: "logo-sub fade-in", style: "animation-delay:1.5s" }, "La cave des secrets"),
+      el("div", { class: "row fade-in", style: "animation-delay:2s" }, enter)));
+  document.body.append(o);
+  let started = false;
+  const go = () => {
+    if (started) return;
+    started = true;
+    if (reduceMotion) return o.remove();
+    o.classList.add("pouring");
+    setTimeout(() => o.remove(), 3250);
+  };
+  enter.addEventListener("click", go);
+  setTimeout(go, 9000);
 }
 
-// big reveal: three bottles pop one after another
+// big reveal: three bottles pop, then a tap floods the screen with wine
 function grandDebouchage() {
   const bottles = el("div", { class: "bottles" }, [0, 1, 2].map((i) => {
     const b = svg(bottleMarkup({ drops: true }), 70, 175);
     b.classList.add("shake", "pop");
-    b.style.setProperty("--i", i);
     b.querySelectorAll(".cork,.drop,.bottle-body").forEach((n) => (n.style.animationDelay = `${0.2 + i * 0.45}s`));
     return b;
   }));
@@ -293,14 +396,90 @@ function grandDebouchage() {
     el("p", { class: "logo-title fade-in", style: "animation-delay:1.4s" }, "Le grand débouchage"),
     el("p", { class: "logo-sub fade-in", style: "animation-delay:1.9s" }, "Découvre qui cachait quoi"),
     el("p", { class: "hint fade-in", style: "animation-delay:2.4s" }, "Touche pour voir les réponses")));
-  o.addEventListener("click", () => o.remove());
+  o.style.overflow = "hidden";
+  o.addEventListener("click", () => {
+    if (reduceMotion) return o.remove();
+    o.append(floodEl()); o.classList.add("drain");
+    setTimeout(() => o.remove(), 1500);
+  }, { once: true });
+}
+
+// the cellar T-Rex: chews charcuterie and holds a glass with its tiny arms
+function dino() {
+  const t = document.createElement("template");
+  t.innerHTML = `<svg class="dino" xmlns="${NS}" viewBox="0 0 320 222" role="img" aria-label="Un T-Rex vert attablé devant du saucisson, du fromage et du vin">
+  <ellipse cx="160" cy="214" rx="140" ry="6" fill="rgba(0,0,0,.25)"/>
+  <g class="tail"><path d="M200 122C246 118 286 140 314 174C300 178 262 162 204 162Z" fill="#4f9a3f"/></g>
+  <ellipse cx="176" cy="140" rx="53" ry="47" fill="#5fae4c"/>
+  <path d="M184 96l8-13 6 14zM204 101l10-11 4 15zM222 112l12-7 1 15z" fill="#3f8a32"/>
+  <ellipse cx="158" cy="152" rx="27" ry="32" fill="#c4e39a"/>
+  <path d="M140 70C150 60 180 62 192 72C205 95 205 115 195 130L145 128C138 110 135 85 140 70Z" fill="#5fae4c"/>
+  <g class="head">
+    <path d="M78 56C80 32 112 20 148 24C176 27 192 42 190 62C188 74 176 80 160 80L96 84C84 82 77 70 78 56Z" fill="#5fae4c"/>
+    <path d="M98 83l4 7 4-7zM110 82l4 7 4-7zM122 82l4 7 4-7zM134 81l4 7 4-7z" fill="#fff"/>
+    <g><circle cx="92" cy="88" r="8" fill="#9e2a3a"/><circle cx="89" cy="86" r="1.4" fill="#f4e7d7"/><circle cx="95" cy="90" r="1.2" fill="#f4e7d7"/><circle cx="93" cy="84.5" r="1" fill="#f4e7d7"/></g>
+    <g class="jaw">
+      <path d="M96 86L162 80C172 82 174 94 164 100C146 108 112 106 100 98C94 95 93 89 96 86Z" fill="#4f9a3f"/>
+      <path d="M104 88l4-6 4 6zM118 87l4-6 4 6zM132 86l4-6 4 6z" fill="#fff"/>
+    </g>
+    <circle cx="158" cy="46" r="9" fill="#fff"/><circle cx="155" cy="47" r="4.6" fill="#2b1520"/><circle cx="153.4" cy="45" r="1.6" fill="#fff"/>
+    <path d="M146 34q12-6 22 2" stroke="#3f8a32" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <ellipse cx="88" cy="48" rx="3" ry="2" fill="#3f8a32"/>
+    <ellipse cx="140" cy="68" rx="8" ry="4" fill="#e58f8f" opacity=".55"/>
+  </g>
+  <circle class="crumb" cx="100" cy="104" r="2.2" fill="#9e2a3a"/>
+  <circle class="crumb c2" cx="110" cy="106" r="1.8" fill="#f2c94c"/>
+  <path d="M142 140L124 144L118 136" stroke="#4f9a3f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g class="glass">
+    <path d="M104 116h20c0 12-4 18-10 18s-10-6-10-18z" fill="rgba(255,255,255,.25)" stroke="#f4e7d7" stroke-width="1.5"/>
+    <path d="M105.6 123h16.8c-.9 6.5-4 9.5-8.4 9.5s-7.5-3-8.4-9.5z" fill="#9e2a3a"/>
+    <path d="M114 134v12M108 146h12" stroke="#f4e7d7" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <rect x="12" y="168" width="296" height="12" rx="3" fill="#8a5a33"/>
+  <rect x="12" y="179" width="296" height="6" fill="#6d4426"/>
+  <rect x="30" y="185" width="10" height="26" fill="#6d4426"/><rect x="280" y="185" width="10" height="26" fill="#6d4426"/>
+  <rect x="38" y="157" width="122" height="11" rx="4" fill="#c9925a"/>
+  <circle cx="56" cy="154" r="9" fill="#9e2a3a"/><circle cx="74" cy="155" r="8" fill="#a8304a"/>
+  <g fill="#f4e7d7"><circle cx="53" cy="152" r="1.4"/><circle cx="59" cy="156" r="1.2"/><circle cx="72" cy="153" r="1.2"/><circle cx="77" cy="157" r="1.3"/></g>
+  <rect x="86" y="146" width="32" height="12" rx="6" fill="#7d2030"/><path d="M90 146v12M98 146v12M106 146v12" stroke="#f4e7d7" stroke-width=".8" opacity=".7"/>
+  <path d="M122 157L158 157L158 135Z" fill="#f2c94c"/><circle cx="148" cy="150" r="2.5" fill="#d9a92e"/><circle cx="154" cy="143" r="1.8" fill="#d9a92e"/><circle cx="141" cy="154" r="1.5" fill="#d9a92e"/>
+  <g fill="#6b3a7a"><circle cx="172" cy="162" r="4.5"/><circle cx="180" cy="162" r="4.5"/><circle cx="176" cy="156" r="4.5"/><circle cx="184" cy="156" r="4"/><circle cx="168" cy="156" r="4"/></g>
+  <path d="M176 151q2-6 6-7" stroke="#4f9a3f" stroke-width="2" fill="none"/>
+  <path d="M212 140h18c0 11-4 16-9 16s-9-5-9-16z" fill="rgba(255,255,255,.25)" stroke="#f4e7d7" stroke-width="1.5"/>
+  <path d="M213.5 146h15c-.8 6-3.5 8.5-7.5 8.5s-6.7-2.5-7.5-8.5z" fill="#9e2a3a"/>
+  <path d="M221 156v11M215 167h12" stroke="#f4e7d7" stroke-width="2" stroke-linecap="round"/>
+  <path d="M258 116h10v16c0 6 9 9 9 18v18h-28v-18c0-9 9-12 9-18z" fill="#2a0c18" stroke="#c9a050" stroke-width="1.5"/>
+  <rect x="257" y="110" width="12" height="8" rx="1" fill="#9e2a3a"/>
+  <rect x="252" y="150" width="22" height="12" rx="1.5" fill="#f4e7d7"/><circle cx="263" cy="155" r="2" fill="#2b1520"/><path d="M262 156h2l1 4h-4z" fill="#2b1520"/>
+</svg>`;
+  const art = t.content.firstChild;
+  const wrap = el("div", { class: "dino-wrap" }, art,
+    el("p", { class: "dino-cap" }, "Le T-Rex de la cave garde vos secrets. Et le saucisson."));
+  // tap the T-Rex: grumpy head shake and a speech bubble
+  let timer;
+  art.addEventListener("click", () => {
+    wrap.querySelector(".bubble")?.remove();
+    const b = el("div", { class: "bubble", role: "status" }, "Ne dérange pas la légende GrangerGroove grand fou\u00a0!");
+    wrap.append(b);
+    art.classList.remove("grumpy"); void art.getBoundingClientRect(); art.classList.add("grumpy");
+    clearTimeout(timer);
+    timer = setTimeout(() => { b.classList.add("bye"); setTimeout(() => b.remove(), 300); }, 3200);
+  });
+  return wrap;
 }
 
 // ---------- player screens ----------
 
 function header(sub) {
-  const logo = svg(bottleMarkup(), 22, 55); logo.classList.add("mini-logo");
-  return [logo, el("h1", {}, "Secret StoRiesling"), sub ? el("p", { class: "lede" }, sub) : null];
+  // centered logo that sways, tap it to pop the cork
+  const logo = svg(bottleMarkup({ drops: true }), 36, 90);
+  logo.classList.add("mini-logo");
+  logo.setAttribute("role", "button");
+  logo.setAttribute("aria-label", "Déboucher");
+  logo.addEventListener("click", () => {
+    logo.classList.remove("mini-pop"); void logo.getBoundingClientRect(); logo.classList.add("mini-pop");
+  });
+  return [el("header", { class: "hdr" }, logo, el("h1", {}, "Secret StoRiesling"), sub ? el("p", { class: "lede" }, sub) : null)];
 }
 
 function joinScreen() {
@@ -323,6 +502,7 @@ function joinScreen() {
     ...header(open
       ? "Dépose un secret sous ton prénom. Personne ne saura qu'il est à toi, et toi tu devras deviner à qui sont les autres."
       : "La partie a commencé, les inscriptions sont fermées."),
+    dino(),
     open ? el("div", {},
       el("label", { for: "name" }, "Ton prénom"), name,
       el("label", { for: "secret" }, "Ton secret"), secret,
@@ -333,7 +513,8 @@ function joinScreen() {
           e.target.disabled = true;
           try {
             const r = await call("/api/join", { name: name.value, secret: secret.value });
-            token = r.token; localStorage.setItem(LS, token); refresh();
+            token = r.token; localStorage.setItem(LS, token);
+            wineWave("Ton secret est en cave", refresh);
           } catch (x) { err.textContent = x.message; err.classList.remove("hidden"); e.target.disabled = false; }
         } }, "Déposer mon secret"),
         el("button", { class: "ghost", onclick: () => loginBox.classList.toggle("hidden") }, "Déjà inscrit"))
@@ -348,6 +529,7 @@ function waitingScreen() {
   return [
     ...header(`C'est noté, ${me.name}. On attend que tout le monde ait déposé son secret.`),
     el("div", { class: "strip" }, el("div", {}, el("b", {}, S.count), el("span", {}, "secrets déposés"))),
+    dino(),
     el("div", { class: "card" },
       el("h2", {}, "Ton code de secours"),
       el("p", { class: "code" }, me.code),
@@ -544,7 +726,9 @@ async function refresh() {
     const busy = document.activeElement && /SELECT|TEXTAREA|INPUT/.test(document.activeElement.tagName);
     const changed = JSON.stringify({ ...next, me: next.me && { ...next.me, cooldownMs: 0 } }) !==
                     JSON.stringify(S && { ...S, me: S.me && { ...S.me, cooldownMs: 0 } });
+    const started = S && S.phase === "inscription" && next.phase === "jeu" && next.me;
     S = next;
+    if (started) return wineWave("Que la dégustation commence !", render);
     // play the big reveal once per player
     if (next.me && next.phase === "revelation" && !localStorage.getItem("qcq-reveal")) {
       localStorage.setItem("qcq-reveal", "1");
